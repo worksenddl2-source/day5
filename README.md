@@ -1,8 +1,8 @@
 # 5일차 — 전기 기초부터 회로 실습, 쇼핑몰 제작·배포까지
 
 > 이 노트는 오늘 수업 여섯 가지를 강의 형식으로 정리한 것입니다.
-> 1~5번은 오르카(Orca) 폴더에 실습 결과가 남아 있어서 그 결과까지 함께 정리했고,
-> 6번(Vercel CLI 배포)은 실습 기록이 없어 내용만 정리했습니다.
+> 모두 오르카(Orca) 폴더에 실습 결과가 남아 있어서 그 결과까지 함께 정리했습니다.
+> 5·6번은 오르카 일렉트릭 쇼핑몰을 완성해 Vercel에 배포한 결과로 정리했습니다.
 
 | # | 주제 | 실습 기록 |
 |---|---|---|
@@ -10,8 +10,8 @@
 | 2 | 회로 구성 (폐회로) | `팅커캐드/회로도 1.png` |
 | 3 | 브레드보드 (노드, 전압분배) | `팅커캐드/회로도2.png` |
 | 4 | 버튼 구성 | `팅커캐드/회로도3.png` |
-| 5 | MCP 연결해서 웹사이트 제작 | `아두이노/`(아두마트), `electric/`(오르카 일렉트릭, 진행 중) |
-| 6 | Vercel CLI 연동해서 배포 | 기록 없음 — 개념 정리 |
+| 5 | MCP 연결해서 웹사이트 제작 | `아두이노/`(아두마트), `electric/`(오르카 일렉트릭, 완성) |
+| 6 | Vercel CLI 연동해서 배포 | `electric/.vercel/` → https://orca-electric.vercel.app |
 
 ---
 
@@ -177,34 +177,56 @@ Supabase MCP를 연결하면 Claude가 대화 중에 테이블 만들기, SQL �
 - 결제: 토스 결제창 → **서버에서 금액 검증 후 승인** → 재고 차감
 - 관리자: 대시보드, 상품 등록·수정(이미지 업로드), 주문 상태 변경
 
-### 지금 만들고 있는 것 ② 오르카 일렉트릭 (`electric/`, 10/28 진행 중)
-"Arduino & Parts" 쇼핑몰을 Next.js 15 + Supabase MCP로 다시 만들고 있습니다.
+### 완성한 것 ② 오르카 일렉트릭 (`electric/`, 10/28 완성·배포)
+"Arduino & Parts" 쇼핑몰을 Next.js 15 + Supabase MCP로 다시 만들어 배포까지 마쳤습니다.
+
+**🔗 사이트: https://orca-electric.vercel.app**
+
+![오르카 일렉트릭 메인](images/shop-home.png)
+
+![오르카 일렉트릭 상품 목록](images/shop-products.png)
 
 | 구분 | 내용 |
 |---|---|
 | 카테고리 | 정품 보드 · 호환 보드 · 센서 모듈 · 디스플레이 · 모터/드라이버 · 부품/액세서리 |
-| 상품 | UNO R3 · UNO R4 WiFi · Mega 2560 · Nano · Leonardo · Micro, 호환 보드(CH340), HC-SR04 · HC-SR501 · DHT22 · MPU6050 · CdS, LCD1602 I2C · TM1637, SG90 · 스텝모터 · L293D, 브레드보드 · 점퍼선 등 21종 |
-| 화면 | 홈, 상품 목록·상세, 장바구니, 주문/결제(성공·실패), 마이페이지, 로그인·회원가입, 이미지 출처 |
-| 관리자 | 대시보드, 상품 목록·등록·수정, 주문 관리 |
-| DB (Supabase) | `profiles` `categories` `products` `orders` `order_items` `reviews` + RLS |
+| 상품 | UNO R3 · UNO R4 WiFi · Mega 2560 · Nano · Leonardo · Micro, 호환 보드(CH340), HC-SR04 · HC-SR501 · DHT22 · MPU6050 · CdS, LCD1602 I2C · TM1637, SG90 · 스텝모터 · L293D, 브레드보드 · 점퍼선 등 21종 (디바이스마트 가격 기준) |
+| 고객 화면 | 메인(히어로·카테고리·인기 상품), 상품 목록(카테고리 필터·검색·정렬), 상품 상세(사양표·리뷰·관련 상품), 장바구니, 주문/결제(성공·실패), 마이페이지(내 정보·주문 내역), 로그인·회원가입, 이미지 출처 |
+| 관리자 | 대시보드(매출·주문 수·재고 부족), 상품 등록·수정·숨김(이미지는 Supabase Storage), 주문 상태 변경 |
+| 배송비 | 2,700원, 66,000원 이상 무료 |
+| DB (Supabase) | `profiles` `categories` `products` `orders` `order_items` `reviews` + 모든 테이블 RLS |
 | DB 함수 | `place_order`(주문 생성) · `confirm_order_payment`(결제 확정) · `cancel_pending_order`(미결제 취소) · `is_admin` |
-| 상태관리·결제 | zustand 장바구니, 토스페이먼츠 SDK |
+| 기술 | Next.js 15 App Router + Server Actions, Tailwind CSS v4, Zustand 장바구니, 토스페이먼츠 결제위젯 SDK v2(테스트 모드) |
 | 환경변수 | `NEXT_PUBLIC_SUPABASE_URL`, `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY`, `NEXT_PUBLIC_TOSS_CLIENT_KEY`, `TOSS_SECRET_KEY`, `PAYMENT_CONFIRM_SECRET` |
 
 **제작 흐름**
 1. `create-next-app`으로 프로젝트 생성
 2. `.mcp.json`에 Supabase MCP 등록 → Claude Code에서 활성화
 3. Claude에게 스키마 설계 요청 → MCP로 마이그레이션 3개 적용 (테이블·RLS → 주문 함수 → 결제 확정 권한 제한)
-4. `seed.sql`로 카테고리·상품 입력, 상품 이미지는 `public/products/`
-5. 쇼핑 화면 → 장바구니 → 결제 → 관리자 순서로 구현
+4. `seed.sql`로 카테고리 6개·상품 21개 입력, 상품 사진은 Wikimedia Commons 자유 라이선스 이미지(`/credits`에 출처 표기)
+5. 쇼핑 화면 → 장바구니 → 결제 → 마이페이지 → 관리자 순서로 구현
+6. GitHub 비공개 저장소(`orca-electric`)에 올리고 Vercel CLI로 배포 (→ 6강)
 
-> 결제 금액은 **반드시 서버(DB 함수)에서 다시 계산**합니다. 브라우저에서 보낸 금액을 믿으면 가격을 조작당할 수 있기 때문입니다.
+**결제 흐름**
+
+```
+배송지 입력 → place_order (DB가 가격·재고 검증 후 주문 생성)
+          → 토스 결제위젯 → 서버에서 토스 결제 승인
+          → confirm_order_payment (비밀값 확인 후 결제 완료 + 재고 차감)
+```
+
+**보안 설계에서 배운 점**
+- 결제 금액은 **반드시 서버(DB 함수)에서 다시 계산**합니다. 브라우저에서 보낸 금액을 믿으면 가격을 조작당할 수 있기 때문입니다.
+- 고객은 본인 주문만 볼 수 있고, 상품·주문 상태 변경은 관리자만 가능합니다(RLS).
+- `profiles.role`은 사용자가 직접 못 바꾸게 컬럼 단위 권한을 막았습니다. 관리자 지정은 SQL Editor에서만 합니다.
+- 결제 확정 함수는 서버만 아는 `PAYMENT_CONFIRM_SECRET`으로 보호하고, 비밀값은 API로 노출되지 않는 `private` 스키마에 둡니다.
+
+**테스트해 보기**: 토스 **테스트 키**라 실제 돈은 나가지 않습니다. 결제창 비밀번호 화면에서 `000000`을 누르면 됩니다.
 
 ---
 
-## 6강. Vercel CLI 연동해서 배포 (내용 정리)
+## 6강. Vercel CLI 연동해서 배포
 
-> 오르카 폴더에 배포 기록(`.vercel/`)이 없어 개념과 명령어만 정리합니다.
+> 오르카 일렉트릭을 실제로 배포했습니다 → **https://orca-electric.vercel.app**
 
 ### 학습 목표
 - 터미널에서 Vercel CLI로 Next.js 사이트를 배포할 수 있다.
@@ -232,6 +254,20 @@ vercel logs <배포주소>    #    문제 생기면 로그 확인
 - 토스 결제 성공·실패 URL도 배포 주소 기준으로 바뀌는지 확인합니다.
 - GitHub 저장소와 연결해 두면 `git push`할 때마다 자동으로 배포됩니다.
 
+### 실습 결과 — 오르카 일렉트릭 배포
+
+```bash
+gh repo create orca-electric --private --source=. --remote=origin --push   # 1. GitHub에 올리기
+vercel link --yes --project orca-electric                                   # 2. Vercel 프로젝트 연결
+vercel env add TOSS_SECRET_KEY --environment production                     # 3. 환경변수 5개 등록
+vercel deploy --prod                                                        # 4. 프로덕션 배포
+```
+
+- 결과 주소: https://orca-electric.vercel.app (메인·상품·장바구니 정상, `/admin`은 로그인 화면으로 이동)
+- 공개 키(`NEXT_PUBLIC_...`)와 비밀 키(`TOSS_SECRET_KEY` 등)를 구분해서 등록했습니다. 비밀 키는 브라우저에 노출되면 안 됩니다.
+- Supabase 대시보드에서 **Site URL**을 배포 주소로, **Redirect URLs**에 `https://orca-electric.vercel.app/auth/callback`을 추가해야 가입 확인 메일 링크가 동작합니다.
+- 비공개 저장소라 Vercel ↔ GitHub 자동 배포는 아직 연결하지 않았습니다. 코드를 고치면 `git push` 후 `vercel deploy --prod`로 다시 배포합니다.
+
 ---
 
 ## 오늘의 핵심 정리
@@ -241,4 +277,4 @@ vercel logs <배포주소>    #    문제 생기면 로그 확인
 3. 브레드보드의 세로 5칸 = 하나의 **노드**. 직렬 저항은 전압을 **비율대로 나눈다.**
 4. 버튼은 폐회로를 **누를 때만 닫는** 장치다.
 5. **MCP**로 AI가 DB를 직접 다루게 해 쇼핑몰을 빠르게 만든다. 금액 검증은 항상 서버에서.
-6. **Vercel CLI**: `login → link → env add → vercel → vercel --prod`.
+6. **Vercel CLI**: `login → link → env add → vercel → vercel --prod`. 완성작: https://orca-electric.vercel.app
